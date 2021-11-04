@@ -68,7 +68,7 @@ test("blog without title is not added", async () => {
   const blogsAtEnd = await helper.blogsInDb();
 
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
-}, 100000);
+});
 
 afterAll(() => {
   mongoose.connection.close();
