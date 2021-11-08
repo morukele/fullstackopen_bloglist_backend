@@ -1,4 +1,6 @@
+const supertest = require("supertest");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
 const initialBlogs = [
   {
@@ -6,12 +8,14 @@ const initialBlogs = [
     author: "Oghenemarho Orukele",
     url: "https://fullstackopen.com",
     likes: 10,
+    user: "61894106347bdf13a4ec0c1b",
   },
   {
     title: "Programming website",
     author: "Oghenemarho Orukele",
     url: "https://fullstackopen.com",
     likes: 10,
+    user: "61894106347bdf13a4ec0c1b",
   },
 ];
 
@@ -35,8 +39,14 @@ const blogsInDb = async () => {
   return blogs.map((blog) => blog.toJSON());
 };
 
+const usersInDb = async () => {
+  const users = await User.find({});
+  return users.map((u) => u.toJSON());
+};
+
 module.exports = {
   initialBlogs,
   nonExistingId,
   blogsInDb,
+  usersInDb,
 };
