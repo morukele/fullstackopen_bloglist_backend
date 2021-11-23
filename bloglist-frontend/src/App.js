@@ -18,10 +18,6 @@ const App = () => {
   const blogFormRef = useRef();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, [user]);
-
-  useEffect(() => {
     const loggedUserJson = window.localStorage.getItem("loggedInUser");
     if (loggedUserJson) {
       const user = JSON.parse(loggedUserJson);
@@ -29,6 +25,10 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
+
+  useEffect(() => {
+    blogService.getAll().then((blogs) => setBlogs(blogs));
+  }, [user]);
 
   const handleLike = async (blog) => {
     try {
@@ -87,7 +87,8 @@ const App = () => {
       newBlog.user = userData;
 
       await blogService.create(newBlog);
-      setBlogs(blogs.concat(newBlog));
+      const _blogs = await blogService.getAll();
+      setBlogs(_blogs);
       setSuccessMessage(
         `a new blog ${newBlog.title} by ${newBlog.author} added`
       );
@@ -137,14 +138,16 @@ const App = () => {
           <Togglable buttonLabel="Create New Blog" ref={blogFormRef}>
             <BlogForm handleCreate={handleCreate} />
           </Togglable>
-          {userBlogs.map((blog) => (
-            <Blog
-              key={blog.title}
-              blog={blog}
-              handleLikes={handleLike}
-              handleDelete={handleDelete}
-            />
-          ))}
+          <div id="bloglist">
+            {userBlogs.map((blog) => (
+              <Blog
+                key={blog.title}
+                blog={blog}
+                handleLikes={handleLike}
+                handleDelete={handleDelete}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

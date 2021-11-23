@@ -8,14 +8,14 @@ const initialBlogs = [
     author: "Oghenemarho Orukele",
     url: "https://fullstackopen.com",
     likes: 10,
-    user: "61894106347bdf13a4ec0c1b",
+    user: "6198b018b73669894b45192b",
   },
   {
     title: "Programming website",
     author: "Oghenemarho Orukele",
     url: "https://fullstackopen.com",
     likes: 10,
-    user: "61894106347bdf13a4ec0c1b",
+    user: "6198b018b73669894b45192b",
   },
 ];
 
