@@ -1,11 +1,9 @@
 const blogReducer = (state = [], action) => {
-  console.log("Token", action);
-  console.log("State", state);
   switch (action.type) {
     case "INIT_BLOGS":
       return action.data;
-    case "SET_TOKEN":
-      return action.data;
+    case "NEW_BLOG":
+      return state.concat(action.data);
     default:
       return state;
   }
@@ -18,10 +16,10 @@ export const initializeBlogs = (blogs) => {
   };
 };
 
-export const setToken = (token) => {
+export const createBlog = (blog) => {
   return {
-    type: "SET_TOKEN",
-    data: token,
+    type: "NEW_BLOG",
+    data: blog,
   };
 };
 

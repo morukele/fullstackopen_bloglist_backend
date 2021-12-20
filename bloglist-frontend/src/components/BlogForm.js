@@ -11,6 +11,7 @@ const BlogForm = ({ handleCreate }) => {
       title: title,
       author: author,
       url: url,
+      likes: 0,
     };
     handleCreate(newBlog);
 

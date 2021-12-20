@@ -1,19 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import loginService from "./services/login";
 import blogService from "./services/blogs";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
-import SuccessNotification from "./components/SuccessNotification";
-import ErrorNotification from "./components/ErrorNotification";
 import "./index.css";
 import Togglable from "./components/Togglable";
+import { createBlog, initializeBlogs } from "./reducers/blogReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, logoutUser } from "./reducers/userReducer";
+import {
+  errorNotification,
+  successNotification,
+} from "./reducers/notificationReducer";
+import Notification from "./components/Notification";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-  const [blogs, setBlogs] = useState([]);
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const dispatch = useDispatch();
 
   const blogFormRef = useRef();
 
@@ -21,14 +24,16 @@ const App = () => {
     const loggedUserJson = window.localStorage.getItem("loggedInUser");
     if (loggedUserJson) {
       const user = JSON.parse(loggedUserJson);
-      setUser(user);
+      dispatch(loginUser(user));
       blogService.setToken(user.token);
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, [user]);
+    blogService.getAll().then((blogs) => dispatch(initializeBlogs(blogs)));
+  }, [dispatch]);
+
+  const user = useSelector((state) => state.users);
 
   const handleLike = async (blog) => {
     try {
@@ -40,13 +45,11 @@ const App = () => {
         url: blog.url,
       };
       await blogService.update(blog.id, updatedBlog);
-      setBlogs(
-        blogs.filter((b) => (b.id === blog.id ? (b.likes = b.likes + 1) : b))
-      );
     } catch (e) {
-      setErrorMessage("Something went wrong");
+      //setErrorMessage("Something went wrong");
+      dispatch(errorNotification("Something went wrong"));
       setTimeout(() => {
-        setErrorMessage(null);
+        dispatch(errorNotification(null));
       }, 5000);
     }
   };
@@ -57,24 +60,23 @@ const App = () => {
 
       window.localStorage.setItem("loggedInUser", JSON.stringify(user));
       blogService.setToken(user.token);
-      setUser(user);
-      setSuccessMessage(`${user.name} succesfully logged in`);
+      dispatch(loginUser(user));
+      dispatch(successNotification(`${user.name} succesfully logged in`));
       setTimeout(() => {
-        setSuccessMessage(null);
+        dispatch(successNotification(null));
       }, 5000);
     } catch (e) {
-      setErrorMessage("wrong username or password");
+      dispatch(errorNotification("wrong username or password"));
       setTimeout(() => {
-        setErrorMessage(null);
+        dispatch(errorNotification(null));
       }, 5000);
     }
   };
 
   const handleLogout = async (event) => {
     window.localStorage.clear();
-    setUser(null);
+    dispatch(logoutUser());
     blogService.setToken(null);
-    setBlogs([]);
   };
 
   const handleCreate = async (newBlog) => {
@@ -87,19 +89,20 @@ const App = () => {
       newBlog.user = userData;
 
       await blogService.create(newBlog);
-      const _blogs = await blogService.getAll();
-      setBlogs(_blogs);
-      setSuccessMessage(
-        `a new blog ${newBlog.title} by ${newBlog.author} added`
+      dispatch(createBlog(newBlog));
+      dispatch(
+        successNotification(
+          `a new blog ${newBlog.title} by ${newBlog.author} added`
+        )
       );
       setTimeout(() => {
-        setSuccessMessage(null);
+        dispatch(successNotification(null));
       }, 5000);
     } catch (e) {
       console.log(e.error);
-      setErrorMessage("Something went wrong");
+      dispatch(errorNotification("Something went wrong"));
       setTimeout(() => {
-        setErrorMessage(null);
+        dispatch(errorNotification(null));
       }, 5000);
     }
   };
@@ -107,14 +110,16 @@ const App = () => {
   const handleDelete = async (blog) => {
     try {
       blogService.remove(blog.id);
-      setBlogs(blogs.filter((b) => b.id !== blog.id));
     } catch (e) {
-      setErrorMessage("Something went wrong");
+      dispatch(errorNotification("Something went wrong"));
       setTimeout(() => {
-        setErrorMessage(null);
+        dispatch(errorNotification(null));
       }, 5000);
     }
   };
+
+  const blogs = useSelector((state) => state.blogs);
+  const notification = useSelector((state) => state.notification);
 
   const userBlogs = user
     ? blogs
@@ -124,9 +129,8 @@ const App = () => {
 
   return (
     <div>
-      <SuccessNotification message={successMessage} />
-      <ErrorNotification message={errorMessage} />
       <h2>Blogs</h2>
+      <Notification data={notification} />
       {user === null ? (
         <LoginForm handleLogin={handleLogin} />
       ) : (
