@@ -4,6 +4,23 @@ const blogReducer = (state = [], action) => {
       return action.data;
     case "NEW_BLOG":
       return state.concat(action.data);
+    case "LIKE_BLOG": {
+      const title = action.data.title;
+      const blogToChange = state.find((b) => b.title === title);
+      const changedBlog = {
+        ...blogToChange,
+        likes: blogToChange.likes + 1,
+      };
+
+      return state.map((blog) => (blog.title !== title ? blog : changedBlog));
+    }
+
+    case "DELETE_BLOG": {
+      const title = action.data.title;
+
+      return state.filter((b) => b.title !== title);
+    }
+
     default:
       return state;
   }
@@ -19,6 +36,20 @@ export const initializeBlogs = (blogs) => {
 export const createBlog = (blog) => {
   return {
     type: "NEW_BLOG",
+    data: blog,
+  };
+};
+
+export const increaseLike = (blog) => {
+  return {
+    type: "LIKE_BLOG",
+    data: blog,
+  };
+};
+
+export const deleteBlog = (blog) => {
+  return {
+    type: "DELETE_BLOG",
     data: blog,
   };
 };

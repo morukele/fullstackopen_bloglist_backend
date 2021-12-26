@@ -1,11 +1,14 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
-const Notification = ({ data }) => {
-  if (!data) {
+const Notification = () => {
+  const notification = useSelector((state) => state.notification);
+
+  if (!notification) {
     return null;
   }
 
-  const { text, type } = data;
+  const { text, type } = notification;
 
   if (!text) {
     return null;
