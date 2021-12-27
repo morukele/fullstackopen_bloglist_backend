@@ -7,7 +7,7 @@ import { deleteBlog, increaseLike } from "../reducers/blogReducer";
 
 const BlogList = () => {
   const blogs = useSelector((state) => state.blogs);
-  const user = useSelector((state) => state.users);
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const userBlogs = user

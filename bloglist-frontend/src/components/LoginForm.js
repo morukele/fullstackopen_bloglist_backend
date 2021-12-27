@@ -7,9 +7,11 @@ import {
   errorNotification,
 } from "../reducers/notificationReducer";
 import { loginUser } from "../reducers/userReducer";
+import { useHistory } from "react-router-dom";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +41,8 @@ const LoginForm = () => {
         dispatch(errorNotification(null));
       }, 5000);
     }
+
+    history.push("/home");
   };
 
   return (
